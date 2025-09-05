@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Anniversary ❤️</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background:#fff0f5; color:#333; text-align:center; }
+  header { padding:50px 20px; background: linear-gradient(135deg, #ff9a9e, #fad0c4); color:white; }
+  header h1 { font-size:2.5em; }
+  section { padding:40px 20px; }
+  .notes, .gallery, .letter { margin:30px auto; max-width:800px; }
+  .note { background:white; padding:20px; margin:10px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+  .gallery { display:flex; flex-wrap:wrap; justify-content:center; }
+  .gallery img { width:200px; height:200px; object-fit:cover; margin:10px; border-radius:12px; cursor:pointer; transition: transform 0.3s; }
+  .gallery img:hover { transform: scale(1.05); }
+  .letter-box { background:#fff; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); text-align:left; white-space:pre-line; font-family:'Georgia', serif; line-height:1.6; }
+  button { background:#ff9a9e; border:none; padding:10px 20px; border-radius:8px; color:white; cursor:pointer; font-size:1em; margin-top:20px; }
+  button:hover { background:#ff6f91; }
+  #start-screen { position:fixed; top:0; left:0; right:0; bottom:0; background:#ffdde1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999; }
+  #lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; z-index:1000; flex-direction:column; padding:20px; box-sizing:border-box; }
+  #lightbox img { max-width:100%; max-height:80%; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.5); opacity:0; transform:scale(0.8); transition: transform 0.5s ease, opacity 0.5s ease; }
+  #lightbox.show img { opacity:1; transform:scale(1); }
+  #lightbox-close { position:absolute; top:20px; right:30px; color:white; font-size:2em; font-weight:bold; cursor:pointer; z-index:1001; }
+  #lightbox-controls { margin-top:20px; display:flex; gap:20px; }
+  #lightbox-controls button { padding:10px 20px; font-size:1em; border-radius:8px; background:#ff9a9e; color:white; border:none; cursor:pointer; }
+  #lightbox-controls button:hover { background:#ff6f91; }
+  @media (max-width:600px) { .gallery img { width:120px; height:120px; margin:5px; } #lightbox-controls button { padding:8px 16px; font-size:0.9em; } }
+</style>
+</head>
+<body>
+
+<div id="start-screen">
+  <h1>Happy Anniversary ❤️</h1>
+  <p>Tap to Begin</p>
+  <button onclick="startExperience()">Start</button>
+</div>
+
+<header>
+  <h1>Happy Anniversary, My Love ❤️</h1>
+</header>
+
+<section class="notes">
+  <h2>Love Notes 💌</h2>
+  <div class="note">You are my sunshine on the cloudiest days.</div>
+  <div class="note">Every moment with you is my favorite memory.</div>
+  <div class="note">I love you more with every heartbeat.</div>
+</section>
+
+<section class="gallery">
+  <h2>Our Memories 📸</h2>
+  <div id="photo-container"></div>
+</section>
+
+<section class="letter">
+  <h2>My Letter to You 💖</h2>
+  <div class="letter-box" id="letter-box"></div>
+  <button onclick="showLetter()">Read</button>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <span id="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <img id="lightbox-img" src="">
+  <div id="lightbox-controls">
+    <button onclick="prevPhoto()">Previous</button>
+    <button onclick="nextPhoto()">Next</button>
+  </div>
+</div>
+
+<audio id="bg-music" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_93e93ff6e7.mp3?filename=love-ambience-11207.mp3" type="audio/mp3">
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+// --- Start experience ---
+function startExperience() {
+  document.getElementById('start-screen').style.display = 'none';
+  const music = document.getElementById('bg-music');
+  music.play().catch(()=>{ console.log('Autoplay blocked'); });
+}
+
+// --- Letter typing ---
+function showLetter() {
+  const box = document.getElementById('letter-box');
+  box.innerHTML = '';
+  let i = 0;
+  const text = `My Love,
+
+Happy first anniversary, my beautiful wife ❤️
+
+It’s only been a year, yet it feels like I’ve loved you forever. You’ve changed my world in ways I never imagined. I fell in love with your cute laugh, your sparkling eyes, the way you look at me that makes my heart skip a beat, and how you taught me to open up and trust you.
+
+I often find myself admiring you, and without realizing it, I catch myself asking for your name in my prayers, asking God to keep you close, to keep you happy, and to keep you in my life forever.
+
+You have this incredible gift of making me happy in the simplest ways, and every love song suddenly makes sense because it reminds me of you. And your smile, your brightest, most beautiful smile, still melts me completely every single time.
+
+This first year has been the most meaningful chapter of my life, and I know it’s only the beginning. Thank you for being my happiness, my safe place, and my greatest blessing. I can’t wait to see what the future holds for us, hand in hand, heart to heart.
+
+Happy anniversary, my love. Here’s to us, to forever, and to a love that only grows stronger with time.
+
+Always yours,
+Haziq Isyraq`;
+
+  function typeChar() {
+    box.innerHTML += text.charAt(i);
+    i++;
+    if(i < text.length){
+      let delay = 25;
+      if(text.charAt(i-1)==='\n' && text.charAt(i)==='\n') delay=700;
+      setTimeout(typeChar, delay);
+    }
+  }
+  typeChar();
+}
+
+// --- Gallery ---
+let photos = [
+  "https://drive.google.com/uc?export=view&id=15yz22zIcLBjXr_qIQrRpHfUg7UUFSg3S",
+  "https://drive.google.com/uc?export=view&id=1oUZ7tfuLDZVlecWcRJr1J2ya2jOPjz1s",
+  "https://drive.google.com/uc?export=view&id=1vWLtf7goM1l09wMZ65FfDPaHfF8zhMhq",
+  "https://drive.google.com/uc?export=view&id=1xWo0E0Cz-Iap8vRd8vTbWGBVvQbWccUj",
+  "https://drive.google.com/uc?export=view&id=18jrf4ehA8et9gueV37ZxbfHLnqJfoVw8",
+  "https://drive.google.com/uc?export=view&id=17C-eIuvBYo2QRLKKTiZ977BVuMSK9aFf",
+  "https://drive.google.com/uc?export=view&id=1xg_m9sODWAa1x90_HG4NEMg6iRuXf9WW",
+  "https://drive.google.com/uc?export=view&id=1uleRPL2mu0VKIm5CRen6cPASlukNXgO6",
+  "https://drive.google.com/uc?export=view&id=1g4qAjnCawI3hN1CdHKypWFoaJ2aTv28B"
+];
+
+let currentIndex = 0;
+const lightboxDiv = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+
+function loadGallery(){
+  const container = document.getElementById('photo-container');
+  photos.forEach((url, index)=>{
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `Memory ${index+1}`;
+    img.onclick = ()=> openLightbox(index);
+    container.appendChild(img);
+  });
+}
+
+function openLightbox(index){
+  currentIndex = index;
+  lightboxImg.src = photos[currentIndex];
+  lightboxDiv.style.display='flex';
+  setTimeout(()=> lightboxDiv.classList.add('show'),20);
+}
+
+function closeLightbox(){
+  lightboxDiv.classList.remove('show');
+  setTimeout(()=> lightboxDiv.style.display='none',500);
+}
+
+function nextPhoto(){
+  currentIndex = (currentIndex+1) % photos.length;
+  transitionPhoto('left');
+}
+
+function prevPhoto(){
+  currentIndex = (currentIndex-1+photos.length) % photos.length;
+  transitionPhoto('right');
+}
+
+function transitionPhoto(direction){
+  lightboxImg.style.transition='transform 0.4s ease, opacity 0.4s ease';
+  lightboxImg.style.opacity='0';
+  lightboxImg.style.transform=`translateX(${direction==='left'?'-50px':'50px'}) scale(0.8)`;
+  setTimeout(()=>{
+    lightboxImg.src = photos[currentIndex];
+    lightboxImg.style.transition='transform 0.5s ease, opacity 0.5s ease';
+    lightboxImg.style.opacity='1';
+    lightboxImg.style.transform='translateX(0) scale(1)';
+  },400);
+}
+
+// Touch swipe
+let startX=0;
+lightboxDiv.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; }, false);
+lightboxDiv.addEventListener('touchend', e=>{
+  let endX = e.changedTouches[0].clientX;
+  if(endX-startX>50) prevPhoto();
+  else if(startX-endX>50) nextPhoto();
+}, false);
+
+loadGallery();
+</script>
+</body>
+</html>
