@@ -12,15 +12,19 @@
     background: #fff0f5;
     color: #333;
     text-align: center;
+    overflow-x: hidden;
+    position: relative;
   }
   header {
     padding: 50px 20px;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
     color: white;
+    position: relative;
+    z-index: 2;
   }
   header h1 { font-size: 2.5em; }
-  section { padding: 40px 20px; }
-  .notes, .gallery, .letter { margin: 30px auto; max-width: 800px; }
+  section { padding: 40px 20px; position: relative; z-index: 2; }
+  .notes, .gallery, .letter { margin: 30px auto; max-width: 800px; position: relative; }
   .note {
     background: white;
     padding: 20px;
@@ -40,8 +44,12 @@
     margin: 10px;
     border-radius: 12px;
     cursor: pointer;
-    transition: transform 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: transform 0.3s, opacity 0.6s ease-in-out;
+    z-index: 2;
   }
+  .gallery img.show { opacity: 1; transform: translateY(0); }
   .gallery img:hover { transform: scale(1.05); }
   .letter-box {
     background: #fff;
@@ -52,6 +60,8 @@
     white-space: pre-line;
     font-family: 'Georgia', serif;
     line-height: 1.6;
+    position: relative;
+    z-index: 2;
   }
   button {
     background: #ff9a9e;
@@ -62,6 +72,8 @@
     cursor: pointer;
     font-size: 1em;
     margin-top: 20px;
+    z-index: 2;
+    position: relative;
   }
   button:hover { background: #ff6f91; }
   #start-screen {
@@ -74,12 +86,10 @@
     justify-content: center;
     z-index: 999;
   }
-
-  /* --- Lightbox Styles --- */
   #lightbox {
     display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top:0; left:0; width:100%; height:100%;
     background: rgba(0,0,0,0.9);
     z-index: 1000;
     justify-content: center;
@@ -90,6 +100,8 @@
     max-width: 90%;
     max-height: 80%;
     border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
   }
   #lightbox .controls {
     margin-top: 15px;
@@ -104,9 +116,40 @@
     cursor: pointer;
     font-size: 1em;
   }
-  #lightbox button:hover {
-    background: rgba(255,255,255,0.4);
+  #lightbox button:hover { background: rgba(255,255,255,0.4); }
+
+  /* Continuous heart shower */
+  .heart {
+    position: fixed;
+    top: -50px;
+    pointer-events: none;
+    z-index: 9999;
+    font-size: 20px;
+    animation: heartFall linear forwards;
+    opacity: 0.9;
   }
+  @keyframes heartFall {
+    0% { transform: translateY(-50px) scale(0.5) rotate(0deg); opacity:1; }
+    100% { transform: translateY(120vh) scale(1.2) rotate(360deg); opacity:0; }
+  }
+
+  /* Background floating hearts */
+  .bg-heart {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    z-index: 0;
+    font-size: 15px;
+    opacity: 0.2;
+    animation: floatHeart 8s linear infinite;
+  }
+  @keyframes floatHeart {
+    0% { transform: translateY(0) rotate(0deg) scale(0.5); }
+    50% { transform: translateY(-20px) rotate(180deg) scale(1); }
+    100% { transform: translateY(0) rotate(360deg) scale(0.5); }
+  }
+
+  @media (max-width: 600px) { .gallery img { width: 120px; height: 120px; margin: 5px; } }
 </style>
 </head>
 <body>
@@ -139,15 +182,13 @@
   <button onclick="showLetter()">Read</button>
 </section>
 
-<!-- 🎵 Background Music -->
 <audio id="bg-music" loop>
   <source src="Penjaga Hati - Nadhif Basalamah Instrumental - Aira.mp3.mp3" type="audio/mp3">
-  Your browser does not support the audio element.
 </audio>
 
-<!-- 📸 Lightbox -->
+<!-- Lightbox -->
 <div id="lightbox">
-  <img id="lightbox-img" src="" alt="Enlarged photo">
+  <img id="lightbox-img" src="">
   <div class="controls">
     <button onclick="prevPhoto()">⟨ Prev</button>
     <button onclick="nextPhoto()">Next ⟩</button>
@@ -158,17 +199,47 @@
 <script>
 function startExperience() {
   document.getElementById('start-screen').style.display='none';
-  const music = document.getElementById('bg-music');
-  music.play().catch(() => {
-    console.log("Autoplay blocked — tap Start again to play music.");
-  });
+  const music=document.getElementById('bg-music');
+  music.play().catch(()=>console.log("Tap Start again to play music."));
 }
 
+// Background floating hearts
+function createBackgroundHeart() {
+  const colors=['#ff6f91','#ffb6c1','#ff9a9e','#ff69b4','#ff1493'];
+  const heart=document.createElement('div');
+  heart.className='bg-heart';
+  heart.innerHTML='❤️';
+  heart.style.color=colors[Math.floor(Math.random()*colors.length)];
+  heart.style.left=Math.random()*window.innerWidth+'px';
+  heart.style.fontSize=(10+Math.random()*20)+'px';
+  heart.style.animationDuration=(5+Math.random()*5)+'s';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),10000);
+}
+for(let i=0;i<15;i++){ createBackgroundHeart(); }
+setInterval(()=>{ createBackgroundHeart(); },2000);
+
+// Continuous heart shower
+function createHeart() {
+  const colors=['#ff6f91','#ffb6c1','#ff9a9e','#ff69b4','#ff1493'];
+  const heart=document.createElement('div');
+  heart.className='heart';
+  heart.innerHTML='❤️';
+  heart.style.color=colors[Math.floor(Math.random()*colors.length)];
+  heart.style.left=Math.random()*window.innerWidth+'px';
+  heart.style.fontSize=(15+Math.random()*25)+'px';
+  heart.style.animationDuration=(3+Math.random()*3)+'s';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),6000);
+}
+setInterval(()=>{ for(let i=0;i<3;i++) createHeart(); },300);
+
+// Dramatic letter typing with hearts
 function showLetter() {
-  const box = document.getElementById('letter-box');
-  box.innerHTML = '';
-  let i = 0;
-  const text = `My Love,
+  const box=document.getElementById('letter-box');
+  box.innerHTML='';
+  let i=0;
+  const text=`My Love,
 
 Happy first anniversary, my beautiful wife ❤️
 
@@ -186,48 +257,65 @@ Always yours,
 Haziq Isyraq`;
 
   function typeChar() {
-    box.innerHTML += text.charAt(i);
+    box.innerHTML+=text.charAt(i);
     i++;
-    if (i < text.length) {
-      let delay = 25;
-      if (text.charAt(i-1) === '\n' && text.charAt(i) === '\n') delay = 700;
-      setTimeout(typeChar, delay);
+    if(Math.random()<0.25) createHeart();
+    if(i<text.length){
+      let delay=25;
+      if(text.charAt(i-1)==='\n' && text.charAt(i)==='\n') delay=700;
+      setTimeout(typeChar,delay);
     }
   }
   typeChar();
 }
 
-// --- Gallery ---
-const photoContainer = document.getElementById("photo-container");
-const totalPhotos = 9; 
-let currentIndex = 0;
-const photos = [];
-
-for (let i = 1; i <= totalPhotos; i++) {
-  const img = document.createElement("img");
-  img.src = `photos/photo${i}.jpg`;
-  img.alt = `Memory ${i}`;
-  img.onclick = () => openLightbox(i-1);
+// Gallery
+const photoContainer=document.getElementById("photo-container");
+const totalPhotos=9;
+let currentIndex=0;
+const photos=[];
+for(let i=1;i<=totalPhotos;i++){
+  const img=document.createElement("img");
+  img.src=`photos/photo${i}.jpg`;
+  img.alt=`Memory ${i}`;
+  img.onclick=()=>openLightbox(i-1);
   photoContainer.appendChild(img);
   photos.push(img.src);
 }
 
-// --- Lightbox Functions ---
-function openLightbox(index) {
-  currentIndex = index;
-  document.getElementById("lightbox-img").src = photos[currentIndex];
-  document.getElementById("lightbox").style.display = "flex";
+// Fade-in gallery images
+const allPhotos=document.querySelectorAll('.gallery img');
+allPhotos.forEach((img,idx)=>{
+  setTimeout(()=>{ img.classList.add('show'); img.style.opacity=1; }, idx*150);
+});
+
+// Lightbox
+function openLightbox(index){
+  currentIndex=index;
+  const lbImg=document.getElementById("lightbox-img");
+  lbImg.style.opacity=0;
+  lbImg.src=photos[currentIndex];
+  document.getElementById("lightbox").style.display="flex";
+  setTimeout(()=>lbImg.style.opacity=1,50);
 }
-function closeLightbox() {
-  document.getElementById("lightbox").style.display = "none";
+function closeLightbox(){ document.getElementById("lightbox").style.display="none"; }
+function nextPhoto(){
+  const lbImg=document.getElementById("lightbox-img");
+  lbImg.style.opacity=0;
+  setTimeout(()=>{
+    currentIndex=(currentIndex+1)%photos.length;
+    lbImg.src=photos[currentIndex];
+    setTimeout(()=>lbImg.style.opacity=1,50);
+  },500);
 }
-function nextPhoto() {
-  currentIndex = (currentIndex + 1) % photos.length;
-  document.getElementById("lightbox-img").src = photos[currentIndex];
-}
-function prevPhoto() {
-  currentIndex = (currentIndex - 1 + photos.length) % photos.length;
-  document.getElementById("lightbox-img").src = photos[currentIndex];
+function prevPhoto(){
+  const lbImg=document.getElementById("lightbox-img");
+  lbImg.style.opacity=0;
+  setTimeout(()=>{
+    currentIndex=(currentIndex-1+photos.length)%photos.length;
+    lbImg.src=photos[currentIndex];
+    setTimeout(()=>lbImg.style.opacity=1,50);
+  },500);
 }
 </script>
 
